@@ -41,7 +41,7 @@ spec = Gem::Specification.new do |s|
 
   # If your tests use any gems, include them here
   s.add_development_dependency("shoulda")
-  s.add_development_dependency("fakeweb")
+  s.add_development_dependency("webmock")
 
   # If you want to publish automatically to rubyforge, you'll may need
   # to tweak this, and the publishing task below too.

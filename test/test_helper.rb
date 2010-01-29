@@ -6,18 +6,15 @@ require 'panelbeater'
  
 require 'test/unit'
 require 'shoulda'
-require 'fakeweb'
- 
+require 'webmock'
+require 'webmock/test_unit'
+
 class Test::Unit::TestCase
   
+  include WebMock
+  
   # we don't want any connections to the outside world
-  FakeWeb.allow_net_connect = false
-  
-  # include RR::Adapters::TestUnit
-  
-  # def response(name)
-  #   Pepper::Stanzas::Epp.parse File.read( File.join(File.dirname(__FILE__),"fixtures", "#{name}.xml") )
-  # end
+  WebMock.disable_net_connect!
   
   def fixture(name)
     File.read( File.join(File.dirname(__FILE__),"fixtures", "#{name}.json") )
