@@ -1,0 +1,1 @@
+{"passwd":[{"status":1,"services":[{"app":"system"},{"app":"ftp"},{"app":"mail"},{"app":"mySQL"}],"statusmsg":"Password changed for user bob","rawout":"Changing password for bob\nPassword for bob has been changed\nUpdating ftp passwords for bob\nFtp password files updated.\nFtp vhost passwords synced\n"}]}
