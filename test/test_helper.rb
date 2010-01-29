@@ -2,12 +2,11 @@ $:.unshift File.join( File.dirname(File.dirname(__FILE__)), 'lib' )
  
 require 'rubygems'
 
-require 'cpanel_api'
+require 'panelbeater'
  
 require 'test/unit'
 require 'shoulda'
 require 'fakeweb'
-# require "rr"
  
 class Test::Unit::TestCase
   

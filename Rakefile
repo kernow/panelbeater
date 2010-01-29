@@ -16,9 +16,9 @@ end
 spec = Gem::Specification.new do |s|
 
   # Change these as appropriate
-  s.name              = "cpanel-gem"
+  s.name              = "panelbeater"
   s.version           = "0.1.0"
-  s.summary           = "A gem for communicating with cPanel"
+  s.summary           = "A gem for communicating with the cPanel and WHM API's"
   s.author            = "Jamie Dyer"
   s.email             = "jamie@kernowsoul.com"
   s.homepage          = "http://kernowsoul.com"
@@ -37,10 +37,11 @@ spec = Gem::Specification.new do |s|
 
   # If you want to depend on other gems, add them here, along with any
   # relevant versions
-  # s.add_dependency("some_other_gem", "~> 0.1.0")
+  s.add_dependency("json")
 
   # If your tests use any gems, include them here
   s.add_development_dependency("shoulda")
+  s.add_development_dependency("fakeweb")
 
   # If you want to publish automatically to rubyforge, you'll may need
   # to tweak this, and the publishing task below too.
