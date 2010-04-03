@@ -22,6 +22,33 @@ class WhmTest < Test::Unit::TestCase
   end
   
   
+  context "returning a successful response" do
+    setup do
+      stub_request(:get, "#{@expected_url}applist?").
+        with(:headers => { 'Authorization' => @expected_auth_header }).
+        to_return(:body => fixture('createacct_success'))
+      @response = @connection.applist
+    end
+
+    should "return true" do
+      assert @response.success?
+    end
+  end
+  
+  
+  context "returning a unsuccessful response" do
+    setup do
+      stub_request(:get, "#{@expected_url}applist?").
+        with(:headers => { 'Authorization' => @expected_auth_header }).
+        to_return(:body => fixture('createacct_fail'))
+      @response = @connection.applist
+    end
+
+    should "return false" do
+      assert !@response.success?
+    end
+  end
+  
   
   context "getting a list of commands the server supports" do
     setup do

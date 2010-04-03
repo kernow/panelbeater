@@ -5,6 +5,10 @@ module CpanelApi
       @response = response
     end
     
+    def success?
+      json['result'].first['status'] == 1
+    end
+    
     def json
       JSON.parse @response.body
     end
