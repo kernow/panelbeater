@@ -163,5 +163,51 @@ class WhmTest < Test::Unit::TestCase
       assert_equal 'Password changed for user bob', @response.statusmsg
     end
   end
+  
+  context "suspending a users account" do
+    
+    context "successfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}suspendacct?reason=non%20payment%20of%20bill&user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('suspendacct_success'))
+        @response = @connection.suspendacct 'amos', 'non payment of bill'
+      end
 
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('suspendacct_success')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert @response.success?
+      end
+
+      should "return the status message" do
+        # yes the WHM API really does return this kind of crap as the status message
+        assert_equal "<script>if (self['clear_ui_status']) { clear_ui_status(); }</script>\nChanging Shell to /bin/false...Changing shell for sdflkhds.\nWarning: \"/bin/false\" is not listed in /etc/shells\nShell changed.\nDone\nLocking Password...Locking password for user sdflkhds.\npasswd: Success\nDone\nSuspending mysql users\nNotification => tom@krystal.co.uk via EMAIL [level => 3]\nUsing Quota v3 Support\nSuspended document root /home/sdflkhds/public_html\nUsing Quota v3 Support\nSuspending FTP accounts...\nUpdating ftp passwords for sdflkhds\nFtp password files updated.\nFtp vhost passwords synced\nsdflkhds's account has been suspended\n", @response.statusmsg
+      end
+    end
+    
+    context "unsuccessfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}suspendacct?reason=non%20payment%20of%20bill&user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('suspendacct_fail'))
+        @response = @connection.suspendacct 'amos', 'non payment of bill'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('suspendacct_fail')), @response.json
+      end
+
+      should "return the request was unsuccessful" do
+        assert !@response.success?
+      end
+
+      should "return the status message" do
+        assert_equal "_suspendacct called for a user that does not exist. (bobbie)", @response.statusmsg
+      end
+    end
+    
+  end
 end

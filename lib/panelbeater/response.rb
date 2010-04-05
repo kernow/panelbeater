@@ -5,7 +5,8 @@ module CpanelApi
       :applist        => 'app',
       :createacct     => 'result',
       :changepackage  => 'result',
-      :passwd         => 'passwd'
+      :passwd         => 'passwd',
+      :suspendacct    => 'result'
     }
     
     def initialize(command, response)
