@@ -1,4 +1,4 @@
-module CpanelApi
+module Panelbeater
   module Whm
     class Commands
       include Model

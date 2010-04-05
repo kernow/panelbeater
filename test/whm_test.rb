@@ -7,7 +7,7 @@ class WhmTest < Test::Unit::TestCase
     reset_webmock
     @expected_url = 'https://cpanel.server.local:2087/json-api/'
     @expected_auth_header = "WHM root:12345678"
-    @connection = CpanelApi::Whm::Commands.new({ :url => 'cpanel.server.local', :api_key => "1234\r5678" })
+    @connection = Panelbeater::Whm::Commands.new({ :url => 'cpanel.server.local', :api_key => "1234\r5678" })
   end
   
   

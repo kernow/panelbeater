@@ -1,4 +1,4 @@
-module CpanelApi
+module Panelbeater
   module Remote
     
     @@default_port = 2087
@@ -25,7 +25,7 @@ module CpanelApi
       options = key_mappings(mappings, options) unless mappings.nil?
       options = filter_options(options)
       response = connect self.base_url, self.port, command, self.user, self.api_key, options
-      CpanelApi::Response.new(command, response)
+      Panelbeater::Response.new(command, response)
     end
     
     def map_options_to_url(options={})

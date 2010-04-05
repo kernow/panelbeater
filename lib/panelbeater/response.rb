@@ -1,4 +1,4 @@
-module CpanelApi
+module Panelbeater
   class Response
     
     @@response_types = {

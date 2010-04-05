@@ -1,4 +1,4 @@
-module CpanelApi
+module Panelbeater
   class FixtureHelper
     
     def self.load(name)

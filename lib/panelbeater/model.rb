@@ -1,4 +1,4 @@
-module CpanelApi
+module Panelbeater
   module Model
     
     def key_mappings(map, hash)
