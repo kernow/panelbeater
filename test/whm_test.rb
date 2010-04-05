@@ -274,4 +274,51 @@ class WhmTest < Test::Unit::TestCase
     end
     
   end
+
+  context "unsuspending a users account" do
+    
+    context "successfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}unsuspendacct?user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('unsuspendacct_success'))
+        @response = @connection.unsuspendacct 'amos'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('unsuspendacct_success')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert @response.success?
+      end
+
+      should "return the status message" do
+        assert_equal "<script>if (self['clear_ui_status']) { clear_ui_status(); }</script>\nChanging shell for sdflkhds.\nShell changed.\nUnlocking password for user sdflkhds.\npasswd: Success.\nUnsuspending FTP accounts...\nUpdating ftp passwords for sdflkhds\nFtp password files updated.\nFtp vhost passwords synced\nsdflkhds's account is now active\nUnsuspending mysql users\nNotification => tom@krystal.co.uk via EMAIL [level => 3]\n", @response.statusmsg
+      end
+    end
+    
+    context "unsuccessfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}unsuspendacct?user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('unsuspendacct_fail'))
+        @response = @connection.unsuspendacct 'amos'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('unsuspendacct_fail')), @response.json
+      end
+
+      should "return the request was unsuccessful" do
+        assert !@response.success?
+      end
+
+      should "return the status message" do
+        assert_equal "_unsuspendacct called for a user that does not exist. (bobbie)", @response.statusmsg
+      end
+    end
+    
+  end
+  
 end
