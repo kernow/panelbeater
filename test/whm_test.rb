@@ -12,7 +12,9 @@ class WhmTest < Test::Unit::TestCase
   
   context "404 error handling" do
     setup do
-      stub_request(:get, "#{@expected_url}applist?").with(:headers => { 'Authorization' => @expected_auth_header }).to_return(:status => "404")
+      stub_request(:get, "#{@expected_url}applist?").
+        with(:headers => { 'Authorization' => @expected_auth_header }).
+        to_return(:status => "404")
       @response = @connection.applist
     end
 
@@ -21,13 +23,12 @@ class WhmTest < Test::Unit::TestCase
     end
   end
   
-  
   context "returning a successful response" do
     setup do
-      stub_request(:get, "#{@expected_url}applist?").
+      stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
         with(:headers => { 'Authorization' => @expected_auth_header }).
         to_return(:body => fixture('createacct_success'))
-      @response = @connection.applist
+      @response = @connection.createacct :username => 'amos'
     end
 
     should "return true" do
@@ -35,13 +36,12 @@ class WhmTest < Test::Unit::TestCase
     end
   end
   
-  
   context "returning a unsuccessful response" do
     setup do
-      stub_request(:get, "#{@expected_url}applist?").
+      stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
         with(:headers => { 'Authorization' => @expected_auth_header }).
         to_return(:body => fixture('createacct_fail'))
-      @response = @connection.applist
+      @response = @connection.createacct :username => 'amos'
     end
 
     should "return false" do
@@ -49,6 +49,18 @@ class WhmTest < Test::Unit::TestCase
     end
   end
   
+  context "getting cpanel data from the cpanel response" do
+    setup do
+      stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
+        with(:headers => { 'Authorization' => @expected_auth_header }).
+        to_return(:body => fixture('createacct_success'))
+      @response = @connection.createacct :username => 'amos'
+    end
+
+    should "return the status message" do
+      assert_equal @response.statusmsg, 'Account Creation Ok'
+    end
+  end
   
   context "getting a list of commands the server supports" do
     setup do
@@ -63,7 +75,6 @@ class WhmTest < Test::Unit::TestCase
     end
   end
   
-  
   context "creating a new account" do
     setup do
       stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
@@ -77,7 +88,6 @@ class WhmTest < Test::Unit::TestCase
     end
   end
   
-  
   context "creating a new account with key mappings" do
     setup do
       stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
@@ -90,7 +100,6 @@ class WhmTest < Test::Unit::TestCase
       assert_equal JSON.parse(fixture('createacct_success')), @response.json
     end
   end
-  
   
   context "changing a users password" do
     setup do
