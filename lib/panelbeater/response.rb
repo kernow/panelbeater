@@ -7,7 +7,8 @@ module Panelbeater
       :changepackage  => 'result',
       :passwd         => 'passwd',
       :suspendacct    => 'result',
-      :unsuspendacct  => 'result'
+      :unsuspendacct  => 'result',
+      :removeacct     => 'result'
     }
     
     def initialize(command, response)

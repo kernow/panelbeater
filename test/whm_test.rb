@@ -321,4 +321,49 @@ class WhmTest < Test::Unit::TestCase
     
   end
   
+  context "removing a users account" do
+    
+    context "successfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}removeacct?keepdns=0&user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('removeacct_success'))
+        @response = @connection.removeacct 'amos'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('removeacct_success')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert @response.success?
+      end
+
+      should "return the status message" do
+        assert_equal "amos account removed", @response.statusmsg
+      end
+    end
+    
+    context "unsuccessfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}removeacct?keepdns=0&user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('removeacct_fail'))
+        @response = @connection.removeacct 'amos'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('removeacct_fail')), @response.json
+      end
+
+      should "return the request was unsuccessful" do
+        assert !@response.success?
+      end
+
+      should "return the status message" do
+        assert_equal "Warning!.. system user amos does not exist!\n", @response.statusmsg
+      end
+    end
+  end
+  
 end
