@@ -17,11 +17,7 @@ module CpanelApi
       http.start do |http|
         req = Net::HTTP::Get.new "/json-api/#{command}#{map_options_to_url(options)}"
         req.add_field 'Authorization', "WHM #{username}:#{api_key}"
-        # req.each_header {|k,v| @log.info "#{k}: #{v}"}
         http.request(req)
-        # puts response.to_yaml
-        # response.value
-        # response.body
       end
     end
     
@@ -29,9 +25,6 @@ module CpanelApi
       options = key_mappings(mappings, options) unless mappings.nil?
       options = filter_options(options)
       response = connect self.base_url, self.port, command, self.user, self.api_key, options
-      # if response.code == '200'
-      #   response.json = JSON.parse(response.body)
-      # end
       CpanelApi::Response.new(response)
     end
     
