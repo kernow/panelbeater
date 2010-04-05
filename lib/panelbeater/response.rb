@@ -2,9 +2,10 @@ module CpanelApi
   class Response
     
     @@response_types = {
-      :applist      => 'app',
-      :createacct   => 'result',
-      :passwd       => 'passwd'
+      :applist        => 'app',
+      :createacct     => 'result',
+      :changepackage  => 'result',
+      :passwd         => 'passwd'
     }
     
     def initialize(command, response)
@@ -13,7 +14,7 @@ module CpanelApi
     end
     
     def success?
-      json[node_name].first['status'] == 1
+      self.status == 1
     end
     
     def code
@@ -26,7 +27,11 @@ module CpanelApi
     
     def method_missing(method, *args)
       # check for a key in the json response
-      return(json[node_name].first[method.to_s]) if json[node_name].first.has_key?(method.to_s)
+      if json[node_name].respond_to? 'first'
+        if json[node_name].first.respond_to?('has_key?') && json[node_name].first.has_key?(method.to_s)
+          json[node_name].first[method.to_s]
+        end
+      end
     end
     
     private

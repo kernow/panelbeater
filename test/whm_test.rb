@@ -73,6 +73,11 @@ class WhmTest < Test::Unit::TestCase
     should "return a list of commands" do
       assert_equal JSON.parse(fixture('applist')), @response.json
     end
+    
+    should "return the request was successful" do
+      # there is no 'status' message returned with an applist request so success? should return false
+      assert !@response.success?
+    end
   end
   
   context "creating a new account" do
@@ -83,8 +88,16 @@ class WhmTest < Test::Unit::TestCase
       @response = @connection.createacct :username => 'amos'
     end
 
-    should "return a list of commands" do
+    should "return the json object" do
       assert_equal JSON.parse(fixture('createacct_success')), @response.json
+    end
+    
+    should "return the request was successful" do
+      assert @response.success?
+    end
+    
+    should "return the status message" do
+      assert_equal 'Account Creation Ok', @response.statusmsg
     end
   end
   
@@ -99,6 +112,35 @@ class WhmTest < Test::Unit::TestCase
     should "return a list of commands" do
       assert_equal JSON.parse(fixture('createacct_success')), @response.json
     end
+    
+    should "return the request was successful" do
+      assert @response.success?
+    end
+    
+    should "return the status message" do
+      assert_equal 'Account Creation Ok', @response.statusmsg
+    end
+  end
+  
+  context "changing a users package" do
+    setup do
+      stub_request(:get, "#{@expected_url}changepackage?pkg=new_package&user=amos").
+        with(:headers => { 'Authorization' => @expected_auth_header }).
+        to_return(:body => fixture('changepackage_success'))
+      @response = @connection.changepackage 'amos', 'new_package'
+    end
+
+    should "return the json object" do
+      assert_equal JSON.parse(fixture('changepackage_success')), @response.json
+    end
+    
+    should "return the request was successful" do
+      assert @response.success?
+    end
+    
+    should "return the status message" do
+      assert_equal 'Account Upgrade/Downgrade Complete for sdflkhds', @response.statusmsg
+    end
   end
   
   context "changing a users password" do
@@ -111,6 +153,14 @@ class WhmTest < Test::Unit::TestCase
 
     should "return a list of commands" do
       assert_equal JSON.parse(fixture('passwd_success')), @response.json
+    end
+    
+    should "return the request was successful" do
+      assert @response.success?
+    end
+    
+    should "return the status message" do
+      assert_equal 'Password changed for user bob', @response.statusmsg
     end
   end
 
