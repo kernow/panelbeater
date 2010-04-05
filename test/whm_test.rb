@@ -4,6 +4,7 @@ require "test_helper"
 class WhmTest < Test::Unit::TestCase
   
   def setup
+    reset_webmock
     @expected_url = 'https://cpanel.server.local:2087/json-api/'
     @expected_auth_header = "WHM root:12345678"
     @connection = CpanelApi::Whm::Commands.new({ :url => 'cpanel.server.local', :api_key => "1234\r5678" })
@@ -49,6 +50,18 @@ class WhmTest < Test::Unit::TestCase
     end
   end
   
+  context "running a request with key mappings" do
+    setup do
+      stub_request(:any, /.*/)
+      @response = @connection.createacct({ :krazy => 'amos' }, { :krazy => :username })
+    end
+
+    should "send the request with the keys mapped correctly" do
+      assert_requested :get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n",
+        :headers => { 'Authorization' => @expected_auth_header }
+    end
+  end
+  
   context "getting cpanel data from the cpanel response" do
     setup do
       stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
@@ -81,86 +94,137 @@ class WhmTest < Test::Unit::TestCase
   end
   
   context "creating a new account" do
-    setup do
-      stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
-        with(:headers => { 'Authorization' => @expected_auth_header }).
-        to_return(:body => fixture('createacct_success'))
-      @response = @connection.createacct :username => 'amos'
-    end
+    
+    context "successfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('createacct_success'))
+        @response = @connection.createacct :username => 'amos'
+      end
 
-    should "return the json object" do
-      assert_equal JSON.parse(fixture('createacct_success')), @response.json
-    end
-    
-    should "return the request was successful" do
-      assert @response.success?
-    end
-    
-    should "return the status message" do
-      assert_equal 'Account Creation Ok', @response.statusmsg
-    end
-  end
-  
-  context "creating a new account with key mappings" do
-    setup do
-      stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
-        with(:headers => { 'Authorization' => @expected_auth_header }).
-        to_return(:body => fixture('createacct_success'))
-      @response = @connection.createacct({ :krazy => 'amos' }, { :krazy => :username })
-    end
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('createacct_success')), @response.json
+      end
 
-    should "return a list of commands" do
-      assert_equal JSON.parse(fixture('createacct_success')), @response.json
+      should "return the request was successful" do
+        assert @response.success?
+      end
+
+      should "return the status message" do
+        assert_equal 'Account Creation Ok', @response.statusmsg
+      end
     end
     
-    should "return the request was successful" do
-      assert @response.success?
-    end
-    
-    should "return the status message" do
-      assert_equal 'Account Creation Ok', @response.statusmsg
+    context "unsuccessfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}createacct?cpmod=x3&maxlst=0&hasshell=n&reseller=0&featurelist=default&ip=n&username=amos&cgi=y&frontpage=n").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('createacct_fail'))
+        @response = @connection.createacct :username => 'amos'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('createacct_fail')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert !@response.success?
+      end
+
+      should "return the status message" do
+        assert_equal "Sorry, that's an invalid domain\n", @response.statusmsg
+      end
     end
   end
   
   context "changing a users package" do
-    setup do
-      stub_request(:get, "#{@expected_url}changepackage?pkg=new_package&user=amos").
-        with(:headers => { 'Authorization' => @expected_auth_header }).
-        to_return(:body => fixture('changepackage_success'))
-      @response = @connection.changepackage 'amos', 'new_package'
-    end
+    
+    context "successfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}changepackage?pkg=new_package&user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('changepackage_success'))
+        @response = @connection.changepackage 'amos', 'new_package'
+      end
 
-    should "return the json object" do
-      assert_equal JSON.parse(fixture('changepackage_success')), @response.json
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('changepackage_success')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert @response.success?
+      end
+
+      should "return the status message" do
+        assert_equal 'Account Upgrade/Downgrade Complete for sdflkhds', @response.statusmsg
+      end
     end
     
-    should "return the request was successful" do
-      assert @response.success?
-    end
-    
-    should "return the status message" do
-      assert_equal 'Account Upgrade/Downgrade Complete for sdflkhds', @response.statusmsg
+    context "unsuccessfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}changepackage?pkg=new_package&user=amos").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('changepackage_fail'))
+        @response = @connection.changepackage 'amos', 'new_package'
+      end
+
+      should "return the json object" do
+        assert_equal JSON.parse(fixture('changepackage_fail')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert !@response.success?
+      end
+
+      should "return the status message" do
+        assert_equal 'Sorry you may not create any more accounts with the package one.', @response.statusmsg
+      end
     end
   end
   
   context "changing a users password" do
-    setup do
-      stub_request(:get, "#{@expected_url}passwd?user=bob&pass=hello").
-        with(:headers => { 'Authorization' => @expected_auth_header }).
-        to_return(:body => fixture('passwd_success'))
-      @response = @connection.passwd('bob', 'hello')
-    end
+    
+    context "successfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}passwd?user=bob&pass=hello").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('passwd_success'))
+        @response = @connection.passwd('bob', 'hello')
+      end
 
-    should "return a list of commands" do
-      assert_equal JSON.parse(fixture('passwd_success')), @response.json
+      should "return a list of commands" do
+        assert_equal JSON.parse(fixture('passwd_success')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert @response.success?
+      end
+
+      should "return the status message" do
+        assert_equal 'Password changed for user bob', @response.statusmsg
+      end
     end
     
-    should "return the request was successful" do
-      assert @response.success?
-    end
-    
-    should "return the status message" do
-      assert_equal 'Password changed for user bob', @response.statusmsg
+    context "unsuccessfully" do
+      setup do
+        stub_request(:get, "#{@expected_url}passwd?user=bob&pass=hello").
+          with(:headers => { 'Authorization' => @expected_auth_header }).
+          to_return(:body => fixture('passwd_fail'))
+        @response = @connection.passwd('bob', 'hello')
+      end
+
+      should "return a list of commands" do
+        assert_equal JSON.parse(fixture('passwd_fail')), @response.json
+      end
+
+      should "return the request was successful" do
+        assert !@response.success?
+      end
+
+      should "return the status message" do
+        assert_equal 'Sorry, the user bob2 does not exist.', @response.statusmsg
+      end
     end
   end
   
