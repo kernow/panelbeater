@@ -218,10 +218,16 @@ module Panelbeater
       # search
       # Search criteria. (Perl Regular Expression)
     
-      def listaccts(term, options={})
-        default_options = {:searchtype => 'user'}
-        all_options = default_options.merge!(options).merge!(:search => term)
-        do_request 'listaccts', all_options
+      def listaccts(term = nil, options={})
+        if term.nil?
+          # Lists all Accounts
+          do_request 'listaccts'
+        else
+          # Lists accounts accorning to the search term
+          default_options = {:searchtype => 'user'}
+          all_options = default_options.merge!(options).merge!(:search => term)
+          do_request 'listaccts', all_options
+        end
       end
     
       # Reseller functionality not needed yet
