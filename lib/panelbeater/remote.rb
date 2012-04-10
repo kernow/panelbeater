@@ -14,6 +14,7 @@ module Panelbeater
     def connect(server, port, command, username, api_key, options={})
       http = Net::HTTP.new(server, port)
       http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE # Ignore invalid SSL certificates
       http.start do |http|
         req = Net::HTTP::Get.new "/json-api/#{command}#{map_options_to_url(options)}"
         req.add_field 'Authorization', "WHM #{username}:#{api_key}"
